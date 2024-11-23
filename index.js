@@ -37,10 +37,35 @@ app.post("/signup", async (req, res) => {
   const existingUser = await userModel.findOne({ name: data.name });
   if (existingUser) {
     res.send("User already exists");
-  }
+  } else {
+    //hash the password
+    const saltRounds = 10; //number of salt rounds for bcrypt
+    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+    //replace hash password with original password
+    data.password = hashedPassword;
 
-  const userData = await userModel.insertMany(data);
-  console.log(userData);
+    const userData = await userModel.insertMany(data);
+    console.log(userData);
+  }
+});
+
+//user login code
+app.post("/login", async (req, res) => {
+  try {
+    const check = await userModel.findOne({ name: req.body.username });
+    if (!check) {
+      res.send("User not found");
+    }
+    //comapre the hash pass from the database with plain text
+    const compare = await bcrypt.compare(req.body.password, check.password);
+    if (compare) {
+      res.render("home");
+    } else {
+      req.send("Incorrect password");
+    }
+  } catch {
+    res.send("User not found");
+  }
 });
 
 const port = 5000;
