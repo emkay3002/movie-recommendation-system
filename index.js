@@ -4,6 +4,7 @@ const app = express();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const AuthRouter = require("./routes/AuthRouter");
+const ProductRouter = require("./routes/ProductRouter");
 //const bcrypt = require("bcryptjs"); //replace string with 'bycrypt' only if this doesnt work
 //const userModel = require("./models/User");
 //const signupValidation = require("./middlewares/AuthValidation");
@@ -21,7 +22,7 @@ app.get("/", (req, res) => {
 app.use(bodyParser.json());
 app.use(cors());
 app.use("/auth", AuthRouter);
-app.use("/products", AuthRouter);
+app.use("/products", ProductRouter);
 //set ejs as a view engine
 //app.set("view engine", "ejs");
 

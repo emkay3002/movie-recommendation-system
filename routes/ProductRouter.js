@@ -1,10 +1,16 @@
+const { ensureAuthenticated } = require("../middlewares/Auth");
+
 const router = require("express").Router();
 
-router.get("/", (req, res) => {
+router.get("/", ensureAuthenticated, (req, res) => {
   res.status(200).json([
     {
       name: "Avengers Endgame",
-      price: 10000,
+      genre: "Sci-Fi",
+    },
+    {
+      name: "The Dark Knight",
+      genre: "Thriller",
     },
   ]);
 });
