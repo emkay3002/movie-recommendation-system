@@ -76,7 +76,7 @@ function Signup() {
   };
   return (
     <div className="container">
-      <h1>Login</h1>
+      <h1>Signup</h1>
       <form onSubmit={handleSignup}>
         <div>
           <label htmlFor="name">Name</label>
