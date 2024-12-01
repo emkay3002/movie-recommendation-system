@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import { handleError } from "../utils";
+import { handleError, handleSuccess } from "../utils";
 function Signup() {
   const [signupInfo, setSignupInfo] = useState({
     name: "",
     email: "",
     password: "",
   });
+
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     console.log(name, value);
@@ -15,16 +18,38 @@ function Signup() {
     copySignupInfo[name] = value;
     setSignupInfo(copySignupInfo);
   };
-
+  const mockFetch = (url, options) => {
+    return new Promise((resolve, reject) => {
+      if (
+        url === "http://localhost:3000/auth/signup" &&
+        options.method === "POST"
+      ) {
+        resolve({
+          json: () =>
+            Promise.resolve({
+              message: "Signup successful",
+              success: true,
+            }),
+        });
+      } else {
+        reject(new Error("Not Found"));
+      }
+    });
+  };
   const handleSignup = async (e) => {
     e.preventDefault();
     const { name, email, password } = signupInfo;
+    //frontend validation
     if (!name || !email || !password) {
       return handleError("All fields are required");
     }
+    if (password.length < 4) {
+      return handleError("Password must be at least 4 characters long");
+    }
     try {
-      const url = "http://localhost:3000/api/auth/signup";
-      const response = await fetch(url, {
+      const url = "http://localhost:3000/auth/signup";
+      console.log(signupInfo);
+      const response = await mockFetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,6 +57,18 @@ function Signup() {
         body: JSON.stringify(signupInfo),
       });
       const result = await response.json();
+      const { success, message, error } = result;
+      if (success) {
+        handleSuccess(message);
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
+      } else if (error) {
+        const details = error?.details[0]?.message;
+        handleError(details);
+      } else if (!success) {
+        handleError(message);
+      }
       console.log(result);
     } catch (err) {
       handleError(err);
