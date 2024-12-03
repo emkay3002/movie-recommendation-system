@@ -5,6 +5,7 @@ import { handleError, handleSuccess } from "../utils";
 
 function Home() {
   const [loggedInUser, setLoggedInUser] = useState("");
+  const [products, setProducts] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,7 +30,7 @@ function Home() {
         console.error("Token not found in localStorage");
         throw new Error("Authorization token not found");
       }
-      console.log("JWT Token:", jwtToken);
+      //console.log("JWT Token:", jwtToken);
 
       const response = await fetch(url, {
         method: "GET",
@@ -48,6 +49,7 @@ function Home() {
 
       const result = await response.json();
       console.log("Products:", result);
+      setProducts(result);
     } catch (err) {
       handleError(err.message);
     }
@@ -59,8 +61,18 @@ function Home() {
 
   return (
     <div>
-      <h1>{loggedInUser}</h1>
+      <h1>Welcome {loggedInUser}</h1>
       <button onClick={handleLogout}>Logout</button>
+      <div>
+        {products &&
+          products?.map((item, index) => (
+            <ul key={index}>
+              <span>
+                {item.name}:{item.genre}
+              </span>
+            </ul>
+          ))}
+      </div>
       <ToastContainer />
     </div>
   );
