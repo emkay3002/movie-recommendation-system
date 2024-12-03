@@ -4,7 +4,7 @@ import { ToastContainer } from "react-toastify";
 import { handleError, handleSuccess } from "../utils";
 function Login() {
   const [loginInfo, setLoginInfo] = useState({
-    email: "",
+    username: "",
     password: "",
   });
 
@@ -20,7 +20,7 @@ function Login() {
   const mockFetch = (url, options) => {
     return new Promise((resolve, reject) => {
       if (
-        url === "http://localhost:3000/auth/login" &&
+        url === "http://localhost:5000/auth/login" &&
         options.method === "POST"
       ) {
         resolve({
@@ -28,7 +28,7 @@ function Login() {
             Promise.resolve({
               message: "Login successful",
               success: true,
-              jwtToken: "token",
+              jwtToken: "jwtToken",
               name: "name",
             }),
         });
@@ -39,58 +39,53 @@ function Login() {
   };
   const handleLogin = async (e) => {
     e.preventDefault();
-    const { email, password } = loginInfo;
-    //frontend validation
-    if (!email || !password) {
+    const { username, password } = loginInfo;
+
+    if (!username || !password) {
       return handleError("All fields are required");
     }
     if (password.length < 4) {
       return handleError("Password must be at least 4 characters long");
     }
+
     try {
-      const url = "http://localhost:3000/auth/login";
-      console.log(loginInfo);
-      const response = await mockFetch(url, {
+      const url = "http://localhost:5000/auth/login";
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(loginInfo),
+        body: JSON.stringify({ username, password }),
       });
+
       const result = await response.json();
       console.log("API Response:", result);
 
-      const { success, message, jwtToken, name, error } = result;
-      if (success) {
-        handleSuccess(message);
-        localStorage.setItem("token", jwtToken);
-        localStorage.setItem("loggedInUser", name);
-        setTimeout(() => {
-          navigate("/home");
-        }, 1000);
-      } else if (error) {
-        const details = error?.details[0]?.message;
-        handleError(details);
-      } else if (!success) {
-        handleError(message);
+      if (response.ok && result.success) {
+        localStorage.setItem("jwtToken", result.jwtToken);
+        localStorage.setItem("loggedInUser", result.username);
+        handleSuccess(result.message);
+        setTimeout(() => navigate("/home"), 1000);
+      } else {
+        handleError(result.message || "Login failed");
       }
-      console.log(result);
     } catch (err) {
-      handleError(err);
+      handleError(err.message || "Network error");
     }
   };
+
   return (
     <div className="container">
       <h1>Login</h1>
       <form onSubmit={handleLogin}>
         <div>
-          <label htmlFor="email">Email</label>
+          <label htmlFor="name">Email</label>
           <input
             onChange={handleChange}
-            type="email"
-            name="email"
-            placeholder="Enter your email"
-            value={loginInfo.email}
+            type="text"
+            name="username"
+            placeholder="Enter your username"
+            value={loginInfo.username}
           />
         </div>
         <div>

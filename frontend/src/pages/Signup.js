@@ -21,7 +21,7 @@ function Signup() {
   const mockFetch = (url, options) => {
     return new Promise((resolve, reject) => {
       if (
-        url === "http://localhost:3000/auth/signup" &&
+        url === "http://localhost:5000/auth/signup" &&
         options.method === "POST"
       ) {
         resolve({
@@ -47,7 +47,7 @@ function Signup() {
       return handleError("Password must be at least 4 characters long");
     }
     try {
-      const url = "http://localhost:3000/auth/signup";
+      const url = "http://localhost:5000/auth/signup";
       console.log(signupInfo);
       const response = await mockFetch(url, {
         method: "POST",
